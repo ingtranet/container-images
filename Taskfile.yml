@@ -1,0 +1,43 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - docker build --platform linux/amd64 -t {{.REPO}}:{{.TAG}} {{.PROJECT}}
+
+  push:
+    cmds:
+      - docker push {{.REPO}}:{{.TAG}}
+
+  airflow:
+    vars:
+      REPO: harbor.ingtra.net/library/airflow
+      TAG: 2.2.4
+      PROJECT: airflow
+    cmds:
+      - task: build
+        vars:
+          REPO: "{{.REPO}}"
+          TAG: "{{.TAG}}"
+          PROJECT: "{{.PROJECT}}"
+      - task: push
+        vars:
+          REPO: "{{.REPO}}"
+          TAG: "{{.TAG}}"
+
+  querybook:
+    vars:
+      REPO: harbor.ingtra.net/library/querybook
+      TAG: 3.4.0
+      PROJECT: querybook
+    cmds:
+      - task: build
+        vars:
+          REPO: "{{.REPO}}"
+          TAG: "{{.TAG}}"
+          PROJECT: "{{.PROJECT}}"
+      - task: push
+        vars:
+          REPO: "{{.REPO}}"
+          TAG: "{{.TAG}}"
+        
