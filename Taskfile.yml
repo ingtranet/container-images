@@ -60,7 +60,7 @@ tasks:
   kyuubi:
     vars:
       REPO: harbor.ingtra.net/library/kyuubi
-      TAG: 3.3.0
+      TAG: 1.5.2
       SPARK_IMAGE: harbor.ingtra.net/library/spark:3.3.0
       VERSION: 1.5.2
       TEMP_DIR:
