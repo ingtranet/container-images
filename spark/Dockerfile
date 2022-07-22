@@ -5,7 +5,7 @@ ENV VERSION=3.3.0
 WORKDIR /build
 
 RUN apt update -y && \
-    apt install -y wget python3
+    apt install -y wget python3 python3-pip
 
 RUN wget http://dlcdn.apache.org/spark/spark-$VERSION/spark-$VERSION.tgz && \
     tar zxf spark-$VERSION.tgz
