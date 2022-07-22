@@ -22,10 +22,9 @@ RUN tar zxf spark-$VERSION-bin-ingtranet.tgz && \
 
 WORKDIR /spark-$VERSION-bin-ingtranet/jars
 
-RUN wget http://repo1.maven.org/maven2/org/bouncycastle/bcprov-jdk15on/1.71/bcprov-jdk15on-1.71.jar
-RUN wget http://repo1.maven.org/maven2/org/bouncycastle/bcpkix-jdk15on/1.71/bcpkix-jdk15on-1.71.jar
-RUN wget http://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark-runtime-3.3_2.13/0.14.0/iceberg-spark-runtime-3.3_2.13-0.14.0.jar
-
+RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcprov-jdk18on/1.71/bcprov-jdk18on-1.71.jar
+RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcpkix-jdk18on/1.71/bcpkix-jdk18on-1.71.jar
+RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/apache/iceberg/iceberg-spark-runtime-3.3_2.13/0.14.0/iceberg-spark-runtime-3.3_2.13-0.14.0.jar
 ##### BUILD FINISHED #####
 
 FROM eclipse-temurin:17
