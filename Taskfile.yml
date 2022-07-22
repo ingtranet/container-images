@@ -49,11 +49,29 @@ tasks:
     cmds:
       - task: build
         vars:
-          REPO: "{{.REPO}}"
+          REPO: "{{.REPO}}" 
           TAG: "{{.TAG}}"
           PROJECT: "{{.PROJECT}}"
       - task: push
         vars:
           REPO: "{{.REPO}}"
           TAG: "{{.TAG}}"
-        
+  
+  kyuubi:
+    vars:
+      REPO: harbor.ingtra.net/library/kyuubi
+      TAG: 3.3.0
+      SPARK_IMAGE: harbor.ingtra.net/library/spark:3.3.0
+      VERSION: 1.5.2
+      TEMP_DIR:
+        sh: mktemp -d
+    env:
+      ARCHS: --platform linux/amd64
+    dir: "{{.TEMP_DIR}}"
+    cmds:
+      - wget https://dlcdn.apache.org/incubator/kyuubi/kyuubi-{{.VERSION}}-incubating/apache-kyuubi-{{.VERSION}}-incubating-bin.tgz
+      - tar zxvf apache-kyuubi-{{.VERSION}}-incubating-bin.tgz
+      - |
+        ./apache-kyuubi-{{.VERSION}}-incubating-bin//bin/docker-image-tool.sh \
+          -r {{.REPO}} -t {{.TAG}} -S /opt/spark -b BASE_IMAGE={{.SPARK_IMAGE}} build
+      - docker push {{.REPO}}:{{.TAG}}
