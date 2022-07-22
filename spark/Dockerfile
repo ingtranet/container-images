@@ -29,6 +29,8 @@ RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/ap
 
 FROM eclipse-temurin:17
 
+ENV VERSION=3.3.0
+
 ARG spark_uid=185
 
 RUN set -ex && \ 
