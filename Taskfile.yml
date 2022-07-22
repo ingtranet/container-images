@@ -40,4 +40,20 @@ tasks:
         vars:
           REPO: "{{.REPO}}"
           TAG: "{{.TAG}}"
+
+  spark:
+    vars:
+      REPO: harbor.ingtra.net/library/spark
+      TAG: 3.3.0
+      PROJECT: spark
+    cmds:
+      - task: build
+        vars:
+          REPO: "{{.REPO}}"
+          TAG: "{{.TAG}}"
+          PROJECT: "{{.PROJECT}}"
+      - task: push
+        vars:
+          REPO: "{{.REPO}}"
+          TAG: "{{.TAG}}"
         
