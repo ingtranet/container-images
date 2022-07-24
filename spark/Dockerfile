@@ -1,9 +1,9 @@
+ARG JAVA_VERSION
+FROM eclipse-temurin:$JAVA_VERSION-jdk AS builder
+
+ARG ICEBERG_VERSION
 ARG SPARK_VERSION
 ARG SCALA_VERSION
-ARG JAVA_VERSION
-ARG ICEBERG_VERSION
-
-FROM eclipse-temurin:$JAVA_VERSION-jdk AS builder
 
 WORKDIR /build
 
@@ -30,6 +30,7 @@ RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bo
 RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/apache/iceberg/iceberg-spark-runtime-3.3_$SCALA_VERSION/$ICEBERG_VERSION/iceberg-spark-runtime-3.3_$SCALA_VERSION-$ICEBERG_VERSION.jar
 ##### BUILD FINISHED #####
 
+ARG JAVA_VERSION
 FROM eclipse-temurin:$JAVA_VERSION
 
 ARG SPARK_VERSION
