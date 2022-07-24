@@ -1,29 +1,13 @@
 version: '3'
 
 tasks:
-  build:
-    cmds:
-      - docker build --platform linux/amd64 -t {{.REPO}}:{{.TAG}} {{.PROJECT}}
-
-  push:
-    cmds:
-      - docker push {{.REPO}}:{{.TAG}}
-
   airflow:
     vars:
       REPO: harbor.ingtra.net/library/airflow
       TAG: 2.3.3
-      PROJECT: airflow
     cmds:
-      - task: build
-        vars:
-          REPO: "{{.REPO}}"
-          TAG: "{{.TAG}}"
-          PROJECT: "{{.PROJECT}}"
-      - task: push
-        vars:
-          REPO: "{{.REPO}}"
-          TAG: "{{.TAG}}"
+      - docker build --platform linux/amd64 -t {{.REPO}}:{{.TAG}} airflow
+      - docker push {{.REPO}}:{{.TAG}}
 
   querybook:
     vars:
@@ -31,31 +15,44 @@ tasks:
       TAG: 3.4.0
       PROJECT: querybook
     cmds:
-      - task: build
-        vars:
-          REPO: "{{.REPO}}"
-          TAG: "{{.TAG}}"
-          PROJECT: "{{.PROJECT}}"
-      - task: push
-        vars:
-          REPO: "{{.REPO}}"
-          TAG: "{{.TAG}}"
+      - docker build --platform linux/amd64 -t {{.REPO}}:{{.TAG}} querybook
+      - docker push {{.REPO}}:{{.TAG}}
 
-  spark:
+  spark-base:
     vars:
       REPO: harbor.ingtra.net/library/spark
-      TAG: 3.3.0
-      PROJECT: spark
+      TAG: "{{.SPARK_VERSION}}-scala{{.SCALA_VERSION}}-java{{.JAVA_VERSION}}-iceberg{{.ICEBERG_VERSION}}"
     cmds:
-      - task: build
+      - |
+        docker build --platform linux/amd64 -t {{.REPO}}:{{.TAG}} \
+          --build-arg SPARK_VERSION={{.SPARK_VERSION}} \
+          --build-arg JAVA_VERSION={{.JAVA_VERSION}} \
+          --build-arg SCALA_VERSION={{.SCALA_VERSION}} \
+          --build-arg ICEBERG_VERSION={{.ICEBERG_VERSION}} \
+          spark
+      - docker push {{.REPO}}:{{.TAG}}
+
+  spark:
+    cmds:
+      - task: spark-base
         vars:
-          REPO: "{{.REPO}}" 
-          TAG: "{{.TAG}}"
-          PROJECT: "{{.PROJECT}}"
-      - task: push
+          SPARK_VERSION: 3.3.0
+          SCALA_VERSION: 2.13
+          JAVA_VERSION: 17
+          ICEBERG_VERSION: 0.14.0
+      - task: spark-base
         vars:
-          REPO: "{{.REPO}}"
-          TAG: "{{.TAG}}"
+          SPARK_VERSION: 3.3.0
+          SCALA_VERSION: 2.13
+          JAVA_VERSION: 11
+          ICEBERG_VERSION: 0.14.0
+      - task: spark-base
+        vars:
+          SPARK_VERSION: 3.3.0
+          SCALA_VERSION: 2.12
+          JAVA_VERSION: 11
+          ICEBERG_VERSION: 0.14.0
+
   
   kyuubi:
     vars:
