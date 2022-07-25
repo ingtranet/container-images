@@ -58,7 +58,7 @@ tasks:
     vars:
       REPO: harbor.ingtra.net/library
       TAG: 1.5.2
-      SPARK_IMAGE: harbor.ingtra.net/library/spark:3.3.0
+      SPARK_IMAGE: harbor.ingtra.net/library/spark:3.3.0-scala2.13-java11-iceberg0.14.0
       VERSION: 1.5.2
       TEMP_DIR:
         sh: mktemp -d
