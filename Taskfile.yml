@@ -50,6 +50,12 @@ tasks:
         vars:
           SPARK_VERSION: 3.3.0
           SCALA_VERSION: 2.12
+          JAVA_VERSION: 17
+          ICEBERG_VERSION: 0.14.1
+      - task: spark-base
+        vars:
+          SPARK_VERSION: 3.3.0
+          SCALA_VERSION: 2.12
           JAVA_VERSION: 11
           ICEBERG_VERSION: 0.14.1
 
