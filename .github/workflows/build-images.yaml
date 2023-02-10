@@ -145,7 +145,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build
-        run: cd kyuubi && .build.sh
+        run: cd kyuubi && ./build.sh
         env:
           KYUUBI_VERSION: ${{ matrix.kyuubi_version }}
           SPARK_IMAGE: ${{ matrix.spark_image }}
