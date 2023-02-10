@@ -1,4 +1,7 @@
-FROM apache/airflow:2.3.3-python3.9
+ARG AIRFLOW_VERSION
+ARG PYTHON_VERSION
+
+FROM apache/airflow:$AIRFLOW_VERSION-python$PYTHON_VERSION
 
 USER root
 RUN apt update -y && apt install -y build-essential libsasl2-dev
