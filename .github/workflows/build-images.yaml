@@ -22,11 +22,12 @@ jobs:
     needs: skip_check
     if: "!fromJSON(needs.pre_job.outputs.paths_result).airflow.should_skip"
     runs-on: ubuntu-latest
-    matrix:
-      airflow_version: 
-        - 2.4.3
-      python_version:
-        - 3.11
+    strategy:
+      matrix:
+        airflow_version: 
+          - 2.4.3
+        python_version:
+          - 3.11
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
