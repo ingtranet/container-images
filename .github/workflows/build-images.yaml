@@ -152,7 +152,7 @@ jobs:
           SPARK_TAG: ${{ matrix.spark_tag }}
       - name: Push
         run: |
-          docker tag ingtranet-kyuubi:latest ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
+          docker tag ingtranet/kyuubi:latest ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
           docker push ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
   build_caddy:
     needs: skip_check
