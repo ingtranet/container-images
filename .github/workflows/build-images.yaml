@@ -76,4 +76,4 @@ jobs:
           tags: ingtranet/querybook:${{ matrix.querybook_version }}
           build-args: |
             QUERYBOOK_VERSION=${{ matrix.querybook_version }}
-          context: airflow
+          context: querybook
