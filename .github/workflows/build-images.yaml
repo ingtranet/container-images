@@ -15,14 +15,17 @@ jobs:
           paths_filter: |
             airflow:
               paths: ["airflow/**"]
+              backtracking: 1
             querybook:
               paths: ["querybook/**"]
+              backtracking: 1
             spark:
               paths: ["spark/**"]
+              backtracking: 1
           do_not_skip: '["workflow_dispatch"]'
   build_airflow:
     needs: skip_check
-    if: "!fromJSON(needs.pre_job.outputs.paths_result).airflow.should_skip"
+    if: "!fromJSON(needs.skip_check.outputs.paths_result).airflow.should_skip"
     runs-on: ubuntu-latest
     strategy:
       matrix:
