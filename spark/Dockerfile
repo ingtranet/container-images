@@ -27,7 +27,7 @@ WORKDIR /spark-$SPARK_VERSION-bin-ingtranet/jars
 
 RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcprov-jdk18on/1.71/bcprov-jdk18on-1.71.jar
 RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcpkix-jdk18on/1.71/bcpkix-jdk18on-1.71.jar
-RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/apache/iceberg/iceberg-spark-runtime-3.3_$SCALA_VERSION/$ICEBERG_VERSION/iceberg-spark-runtime-3.3_$SCALA_VERSION-$ICEBERG_VERSION.jar
+RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/apache/iceberg/iceberg-spark-runtime-${SPARK_VERSION:0:3}_$SCALA_VERSION/$ICEBERG_VERSION/iceberg-spark-runtime-${SPARK_VERSION:0:3}_$SCALA_VERSION-$ICEBERG_VERSION.jar
 ##### BUILD FINISHED #####
 
 ARG JAVA_VERSION
