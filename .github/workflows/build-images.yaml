@@ -22,7 +22,7 @@ jobs:
           do_not_skip: '["workflow_dispatch"]'
   build_airflow:
     needs: skip_check
-    if: contains(github.event.head_commit.message, '[airflow]') || !fromJSON(needs.skip_check.outputs.paths_result).airflow.should_skip"
+    if: contains(github.event.head_commit.message, '[airflow]') || !fromJSON(needs.skip_check.outputs.paths_result).airflow.should_skip
     runs-on: ubuntu-latest
     strategy:
       matrix:
