@@ -80,7 +80,7 @@ jobs:
   build_spark:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[spark]') || !fromJSON(needs.skip_check.outputs.paths_result).spark.should_skip
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         spark_version:
