@@ -19,8 +19,7 @@ jobs:
               paths: ["querybook/**"]
             spark:
               paths: ["spark/**"]
-          do_not_skip:
-            - workflow_dispatch
+          do_not_skip: '["workflow_dispatch"]'
   build_airflow:
     needs: skip_check
     if: "!fromJSON(needs.pre_job.outputs.paths_result).airflow.should_skip"
