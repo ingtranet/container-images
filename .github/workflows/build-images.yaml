@@ -2,6 +2,7 @@ name: Build Images
 run-name: ${{ github.repository }} is building container images
 on:
   - push
+  - workflow_dispatch
 jobs:
   skip_check:
     runs-on: ubuntu-latest
@@ -18,6 +19,8 @@ jobs:
               paths: ["querybook/**"]
             spark:
               paths: ["spark/**"]
+          do_not_skip:
+            - workflow_dispatch
   build_airflow:
     needs: skip_check
     if: "!fromJSON(needs.pre_job.outputs.paths_result).airflow.should_skip"
