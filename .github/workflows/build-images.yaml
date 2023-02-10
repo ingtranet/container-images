@@ -14,12 +14,14 @@ jobs:
           paths_filter: |
             airflow:
               paths: ["airflow/**"]
+            caddy:
+              paths: ["caddy/**"]
+            kyuubi:
+              paths: ["kyuubi/**"]
             querybook:
               paths: ["querybook/**"]
             spark:
               paths: ["spark/**"]
-            kyuubi:
-              paths: ["kyuubi/**"]
   build_airflow:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[airflow]') || !fromJSON(needs.skip_check.outputs.paths_result).airflow.should_skip
@@ -42,7 +44,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push
+      - name: Build & PUSH
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -71,7 +73,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push
+      - name: Build & PUSH
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -107,7 +109,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push
+      - name: Build & PUSH
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -152,3 +154,31 @@ jobs:
         run: |
           docker tag ingtranet-kyuubi:latest ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
           docker push ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
+  build_caddy:
+    needs: skip_check
+    if: contains(github.event.head_commit.message, '[caddy]') || !fromJSON(needs.skip_check.outputs.paths_result).caddy.should_skip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        caddy_version:
+          - "2.6.3"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build & PUSH
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ingtranet/caddy:${{ matrix.caddy_version }}
+          build-args: |
+            CADDY_VERSION=${{ matrix.caddy_version }}
+          context: caddy
