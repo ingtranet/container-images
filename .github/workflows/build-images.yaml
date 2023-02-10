@@ -73,7 +73,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build & PUSH
+      - name: Build & Push
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -83,7 +83,7 @@ jobs:
           context: querybook
   build_spark:
     needs: skip_check
-    if: false && contains(github.event.head_commit.message, '[spark]') || !fromJSON(needs.skip_check.outputs.paths_result).spark.should_skip
+    if: contains(github.event.head_commit.message, '[spark]') || !fromJSON(needs.skip_check.outputs.paths_result).spark.should_skip
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -109,7 +109,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build & PUSH
+      - name: Build & Push
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -145,7 +145,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build
-        run: kyuubi/build.sh
+        run: cd kyuubi && .build.sh
         env:
           KYUUBI_VERSION: ${{ matrix.kyuubi_version }}
           SPARK_IMAGE: ${{ matrix.spark_image }}
@@ -174,7 +174,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build & PUSH
+      - name: Build & Push
         uses: docker/build-push-action@v4
         with:
           push: true
