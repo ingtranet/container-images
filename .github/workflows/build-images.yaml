@@ -1,5 +1,5 @@
 name: Build Images
-run-name: [${{ github.repository }}] Build & Push Images
+run-name: "[${{ github.repository }}] Build & Push Images"
   - push
 jobs:
   skip_check:
