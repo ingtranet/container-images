@@ -43,7 +43,8 @@ jobs:
         with:
           push: true
           tags: ingtranet/airflow:latest
-          build-args:
-            - AIRFLOW_VERSION=${{ matrix.airflow_version }}
-            - PYTHON_VERSION=${{ matrix.python_version }}
+          build-args: |
+            AIRFLOW_VERSION=${{ matrix.airflow_version }}
+            PYTHON_VERSION=${{ matrix.python_version }}
+          context: airflow
 
