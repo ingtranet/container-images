@@ -188,7 +188,7 @@ jobs:
           - "11"
           - "17"
         iceberg_version:
-          - "1.1.0"
+          - "1.2.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
