@@ -18,6 +18,8 @@ jobs:
               paths: ["caddy/**"]
             kyuubi:
               paths: ["kyuubi/**"]
+            opensearch-dashboards:
+              paths: ["opensearch-dashboards/**"]
             querybook:
               paths: ["querybook/**"]
             spark:
@@ -53,6 +55,96 @@ jobs:
             AIRFLOW_VERSION=${{ matrix.airflow_version }}
             PYTHON_VERSION=${{ matrix.python_version }}
           context: airflow
+  build_caddy:
+    needs: skip_check
+    if: contains(github.event.head_commit.message, '[caddy]') || !fromJSON(needs.skip_check.outputs.paths_result).caddy.should_skip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        caddy_version:
+          - "2.6.3"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build & Push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ingtranet/caddy:${{ matrix.caddy_version }}
+          build-args: |
+            CADDY_VERSION=${{ matrix.caddy_version }}
+          context: caddy
+  build_kyuubi:
+    needs: [skip_check, build_spark]
+    if: contains(github.event.head_commit.message, '[kyuubi]') || !fromJSON(needs.skip_check.outputs.paths_result).kyuubi.should_skip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kyuubi_version:
+          - "1.6.1"
+        spark_image:
+          - "ingtranet/spark"
+        spark_tag:
+          - "3.3.1-scala2.12-java11-iceberg1.1.0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build
+        run: cd kyuubi && ./build.sh
+        env:
+          KYUUBI_VERSION: ${{ matrix.kyuubi_version }}
+          SPARK_IMAGE: ${{ matrix.spark_image }}
+          SPARK_TAG: ${{ matrix.spark_tag }}
+      - name: Push
+        run: |
+          docker tag ingtranet/kyuubi:latest ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
+          docker push ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
+  build_opensearch_dashboards:
+    needs: skip_check
+    if: contains(github.event.head_commit.message, '[opensearch-dashboards]') || !fromJSON(needs.skip_check.outputs.paths_result).opensearch-dashboards.should_skip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        opensearch_dashboards_version: 
+          - "2.6.0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build & Push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ingtranet/opensearch-dashboards:${{ matrix.opensearch_dashboards_version }}
+          build-args: |
+            OPENSEARCH_DASHBOARDS_VERSION=${{ matrix.opensearch_dashboards_version }}
+          context: opensearch-dashboards
   build_querybook:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[querybook]') || !fromJSON(needs.skip_check.outputs.paths_result).querybook.should_skip
@@ -120,65 +212,3 @@ jobs:
             JAVA_VERSION=${{ matrix.java_version }}
             ICEBERG_VERSION=${{ matrix.iceberg_version }}
           context: spark
-  build_kyuubi:
-    needs: [skip_check, build_spark]
-    if: contains(github.event.head_commit.message, '[kyuubi]') || !fromJSON(needs.skip_check.outputs.paths_result).kyuubi.should_skip
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        kyuubi_version:
-          - "1.6.1"
-        spark_image:
-          - "ingtranet/spark"
-        spark_tag:
-          - "3.3.1-scala2.12-java11-iceberg1.1.0"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build
-        run: cd kyuubi && ./build.sh
-        env:
-          KYUUBI_VERSION: ${{ matrix.kyuubi_version }}
-          SPARK_IMAGE: ${{ matrix.spark_image }}
-          SPARK_TAG: ${{ matrix.spark_tag }}
-      - name: Push
-        run: |
-          docker tag ingtranet/kyuubi:latest ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
-          docker push ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
-  build_caddy:
-    needs: skip_check
-    if: contains(github.event.head_commit.message, '[caddy]') || !fromJSON(needs.skip_check.outputs.paths_result).caddy.should_skip
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        caddy_version:
-          - "2.6.3"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build & Push
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          tags: ingtranet/caddy:${{ matrix.caddy_version }}
-          build-args: |
-            CADDY_VERSION=${{ matrix.caddy_version }}
-          context: caddy
