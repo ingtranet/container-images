@@ -90,11 +90,11 @@ jobs:
     strategy:
       matrix:
         kyuubi_version:
-          - "1.6.1"
+          - "1.7.0"
         spark_image:
           - "ingtranet/spark"
         spark_tag:
-          - "3.3.1-scala2.12-java11-iceberg1.1.0"
+          - "3.3.2-scala2.12-java11-iceberg1.2.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
