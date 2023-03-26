@@ -84,7 +84,7 @@ jobs:
             CADDY_VERSION=${{ matrix.caddy_version }}
           context: caddy
   build_kyuubi:
-    needs: [skip_check, build_spark]
+    needs: [skip_check]
     if: contains(github.event.head_commit.message, '[kyuubi]') || !fromJSON(needs.skip_check.outputs.paths_result).kyuubi.should_skip
     runs-on: ubuntu-latest
     strategy:
