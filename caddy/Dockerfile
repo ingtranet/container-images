@@ -2,7 +2,8 @@ ARG CADDY_VERSION
 FROM caddy:$CADDY_VERSION-builder AS builder
 
 RUN xcaddy build \
-    --with github.com/caddy-dns/cloudflare
+    --with github.com/caddy-dns/cloudflare \
+    --with github.com/ss098/certmagic-s3
 
 FROM caddy:$CADDY_VERSION
 
