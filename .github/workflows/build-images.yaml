@@ -55,9 +55,7 @@ jobs:
             AIRFLOW_VERSION=${{ matrix.airflow_version }}
             PYTHON_VERSION=${{ matrix.python_version }}
           context: airflow
-          platforms:
-            - linux/amd64
-            - linux/arm64
+          platforms: linux/amd64,linux/arm64
   build_caddy:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[caddy]') || !fromJSON(needs.skip_check.outputs.paths_result).caddy.should_skip
@@ -86,9 +84,7 @@ jobs:
           build-args: |
             CADDY_VERSION=${{ matrix.caddy_version }}
           context: caddy
-          platforms:
-            - linux/amd64
-            - linux/arm64
+          platforms: linux/amd64,linux/arm64
   build_kyuubi:
     needs: [skip_check]
     if: contains(github.event.head_commit.message, '[kyuubi]') || !fromJSON(needs.skip_check.outputs.paths_result).kyuubi.should_skip
@@ -151,9 +147,7 @@ jobs:
           build-args: |
             OPENSEARCH_DASHBOARDS_VERSION=${{ matrix.opensearch_dashboards_version }}
           context: opensearch-dashboards
-          platforms:
-            - linux/amd64
-            - linux/arm64
+          platforms: linux/amd64,linux/arm64
   build_querybook:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[querybook]') || !fromJSON(needs.skip_check.outputs.paths_result).querybook.should_skip
@@ -182,9 +176,7 @@ jobs:
           build-args: |
             QUERYBOOK_VERSION=${{ matrix.querybook_version }}
           context: querybook
-          platforms:
-            - linux/amd64
-            - linux/arm64
+          platforms: linux/amd64,linux/arm64
   build_spark:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[spark]') || !fromJSON(needs.skip_check.outputs.paths_result).spark.should_skip
@@ -224,6 +216,4 @@ jobs:
             JAVA_VERSION=${{ matrix.java_version }}
             ICEBERG_VERSION=${{ matrix.iceberg_version }}
           context: spark
-          platforms:
-            - linux/amd64
-            - linux/arm64
+          platforms: linux/amd64,linux/arm64
