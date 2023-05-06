@@ -121,7 +121,7 @@ jobs:
         env:
           K0S_VERSION: ${{ matrix.k0s_version }}
         run: |
-          export K0S_IMAGE_TAG=${K0S_VERSION//+/-}
+          echo "K0S_IMAGE_TAG=${K0S_VERSION//+/-}" >> $GITHUB_ENV
       - name: Build & Push
         uses: docker/build-push-action@v4
         with:
