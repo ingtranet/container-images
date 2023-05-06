@@ -117,11 +117,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Replace + to - in k0s_version\
+        env:
+          K0S_VERSION: ${{ matrix.k0s_version }}
+        run: |
+          echo "TEMPENV=${K0S_VERSION//+/-}" >> $K0S_IMAGE_TAG
       - name: Build & Push
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ingtranet/k0s:${{ matrix.k0s_version }}-${{ matrix.type }}-${{ matrix.image_version }}
+          tags: ingtranet/k0s:${{ env.K0S_IMAGE_TAG }}-${{ matrix.type }}-${{ matrix.image_version }}
           build-args: |
             K0S_VERSION=${{ matrix.k0s_version }}
             IMAGE_VERSION=${{ matrix.image_version }}
@@ -230,12 +235,10 @@ jobs:
           - "3.3.2"
         scala_version:
           - "2.12"
-          - "2.13"
         java_version:
           - "11"
-          - "17"
         iceberg_version:
-          - "1.2.0"
+          - "1.2.1"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
