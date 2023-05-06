@@ -120,8 +120,7 @@ jobs:
       - name: Replace + to - in k0s_version\
         env:
           K0S_VERSION: ${{ matrix.k0s_version }}
-        run: |
-          echo "TEMPENV=${K0S_VERSION//+/-}" >> $K0S_IMAGE_TAG
+        run: echo "TEMPENV=${K0S_VERSION//+/-}" >> $K0S_IMAGE_TAG
       - name: Build & Push
         uses: docker/build-push-action@v4
         with:
