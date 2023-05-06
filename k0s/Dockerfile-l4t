@@ -8,4 +8,4 @@ RUN apt-get update -y && apt-get install -y nvidia-container-runtime && apt-get 
 RUN curl -sSLf https://get.k0s.sh | K0S_VERSION=$K0S_VERSION sh
 
 COPY entrypoint.sh /
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/entrypoint.sh"]

@@ -8,4 +8,4 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
 RUN curl -sSLf https://get.k0s.sh | K0S_VERSION=$K0S_VERSION sh
 
 COPY entrypoint.sh /
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/entrypoint.sh"]
