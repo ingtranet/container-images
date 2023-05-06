@@ -16,6 +16,8 @@ jobs:
               paths: ["airflow/**"]
             caddy:
               paths: ["caddy/**"]
+            k0s:
+              paths: ["k0s/**"]
             kyuubi:
               paths: ["kyuubi/**"]
             opensearch-dashboards:
@@ -85,6 +87,47 @@ jobs:
             CADDY_VERSION=${{ matrix.caddy_version }}
           context: caddy
           platforms: linux/amd64,linux/arm64
+  build_k0s:
+    needs: skip_check
+    if: contains(github.event.head_commit.message, '[k0s]') || !fromJSON(needs.skip_check.outputs.paths_result).k0s.should_skip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        k0s_version:
+          - v1.27.1+k0s.0
+        type:
+          - rocky
+          - l4t
+        include:
+          - type: rocky
+            image_version: 9.1.20230215
+            platforms: linux/amd64,linux/arm64
+          - type: l4t
+            image_version: r35.1.0
+            platforms: linux/arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build & Push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ingtranet/k0s:${{ matrix.k0s_version }}-${{ matrix.type }}-${{ matrix.image_version }}
+          build-args: |
+            K0S_VERSION=${{ matrix.k0s_version }}
+            IMAGE_VERSION=${{ matrix.image_version }}
+          context: k0s
+          file: k0s/Dockerfile-${{ matrix.type }}
+          platforms: ${{ matrix.platforms }}
   build_kyuubi:
     needs: [skip_check]
     if: contains(github.event.head_commit.message, '[kyuubi]') || !fromJSON(needs.skip_check.outputs.paths_result).kyuubi.should_skip
