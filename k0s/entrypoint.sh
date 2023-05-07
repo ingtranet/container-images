@@ -13,17 +13,6 @@ docker_embedded_dns_ip='127.0.0.11'
 docker_host_ip="$(ip -4 route show default | cut -d' ' -f3)"
 dns_server=${DNS_SERVER:-$docker_host_ip}
 
-# patch docker's iptables rules to switch out the DNS IP
-iptables-save \
-  | sed \
-    `# switch docker DNS DNAT rules to our chosen IP` \
-    -e "s/-d ${docker_embedded_dns_ip}/-d ${dns_server}/g" \
-    `# we need to also apply these rules to non-local traffic (from pods)` \
-    -e 's/-A OUTPUT \(.*\) -j DOCKER_OUTPUT/\0\n-A PREROUTING \1 -j DOCKER_OUTPUT/' \
-    `# switch docker DNS SNAT rules rules to our chosen IP` \
-    -e "s/--to-source :53/--to-source ${dns_server}:53/g"\
-  | iptables-restore
-
 # now we can ensure that DNS is configured to use our IP
 cp /etc/resolv.conf /etc/resolv.conf.original
 sed -e "s/${docker_embedded_dns_ip}/${dns_server}/g" /etc/resolv.conf.original >/etc/resolv.conf
