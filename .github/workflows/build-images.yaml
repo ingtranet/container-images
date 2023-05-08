@@ -157,15 +157,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build
+      - name: Build & Push
         run: cd kyuubi && ./build.sh
         env:
           KYUUBI_VERSION: ${{ matrix.kyuubi_version }}
           SPARK_IMAGE: ${{ matrix.spark_image }}
           SPARK_TAG: ${{ matrix.spark_tag }}
-      - name: Push
-        run: |
-          docker push ingtranet/kyuubi:${{ matrix.kyuubi_version }}-spark${{ matrix.spark_tag }}
   build_opensearch_dashboards:
     needs: skip_check
     if: contains(github.event.head_commit.message, '[opensearch-dashboards]') || !fromJSON(needs.skip_check.outputs.paths_result).opensearch-dashboards.should_skip
