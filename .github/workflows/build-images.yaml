@@ -97,13 +97,13 @@ jobs:
           - v1.27.1+k0s.0
         type:
           - rocky
-          - l4t
+          - l4t-jetpack
         include:
           - type: rocky
             image_version: 9.1.20230215
             platforms: linux/amd64,linux/arm64
-          - type: l4t
-            image_version: r35.1.0
+          - type: l4t-jetpack
+            image_version: r35.3.1
             platforms: linux/arm64
     steps:
       - name: Checkout
