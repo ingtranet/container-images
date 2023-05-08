@@ -4,7 +4,7 @@ ARG PYTHON_VERSION
 FROM apache/airflow:$AIRFLOW_VERSION-python$PYTHON_VERSION
 
 USER root
-RUN apt update -y && apt install -y build-essential libsasl2-dev
+RUN apt update -y && apt install -y build-essential libsasl2-dev libmysqlclient-dev
 
 USER airflow
 COPY requirements.txt /tmp/requirements.txt
