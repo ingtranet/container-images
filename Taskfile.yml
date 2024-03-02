@@ -1,0 +1,99 @@
+version: '3'
+
+tasks:
+  airflow:
+    vars:
+      REPO: ingtranet/airflow
+      AIRFLOW_VERSION: 2.8.1
+      PYTHON_VERSION: 3.11
+      TAG: "{{.AIRFLOW_VERSION}}-python{{.PYTHON_VERSION}}"
+    cmds:
+      - |
+        docker buildx build --push -t {{.REPO}}:{{.TAG}} \
+          --platform linux/amd64,linux/arm64 \
+          --build-arg AIRFLOW_VERSION={{.AIRFLOW_VERSION}} \
+          --build-arg PYTHON_VERSION={{.PYTHON_VERSION}} \
+          airflow
+
+  caddy:
+    vars:
+      REPO: ingtranet/caddy
+      CADDY_VERSION: 2.7.6
+    cmds:
+      - |
+        docker buildx build --push -t {{.REPO}}:{{.CADDY_VERSION}} \
+          --platform linux/amd64,linux/arm64 \
+          --build-arg CADDY_VERSION={{.CADDY_VERSION}} \
+          caddy
+
+  kyuubi:
+    vars:
+      REPO: ingtranet/kyuubi
+      VERSION: 1.6.1
+      SPARK_IMAGE: harbor.ingtra.net/library/spark:3.3.1-scala2.12-java11-iceberg0.14.1
+      TEMP_DIR:
+        sh: mktemp -d
+    env:
+      ARCHS: --platform linux/amd64
+    dir: "{{.TEMP_DIR}}"
+    cmds:
+      - wget https://dlcdn.apache.org/incubator/kyuubi/kyuubi-{{.VERSION}}-incubating/apache-kyuubi-{{.VERSION}}-incubating-bin.tgz
+      - tar zxvf apache-kyuubi-{{.VERSION}}-incubating-bin.tgz
+      - |
+        ./apache-kyuubi-{{.VERSION}}-incubating-bin//bin/docker-image-tool.sh \
+          -r {{.REPO}} -t {{.TAG}} -S /opt/spark -b BASE_IMAGE={{.SPARK_IMAGE}} build
+      - docker push {{.REPO}}/kyuubi:{{.TAG}}
+
+  mlflow:
+    vars:
+      REPO: ingtranet/mlflow
+      MLFLOW_VERSION: v2.9.2
+      TAG: "{{.MLFLOW_VERSION}}"
+    cmds:
+      - |
+        docker buildx build --push -t {{.REPO}}:{{.TAG}} \
+          --platform linux/amd64,linux/arm64 \
+          --build-arg MLFLOW_VERSION={{.MLFLOW_VERSION}} \
+          mlflow
+
+  py-pack:
+    cmds:
+      - |
+        docker buildx build --push -t harbor.ingtra.net/library/py-pack:ml-test \
+          --platform linux/arm64 \
+          py-pack/ml
+  spark-base:
+    vars:
+      REPO: ingtranet/spark
+      TAG: "{{.SPARK_VERSION}}-scala{{.SCALA_VERSION}}-java{{.JAVA_VERSION}}-iceberg{{.ICEBERG_VERSION}}"
+    cmds:
+      - |
+        docker buildx build --push -t {{.REPO}}:{{.TAG}} \
+          --platform linux/amd64,linux/arm64 \
+          --build-arg SPARK_VERSION={{.SPARK_VERSION}} \
+          --build-arg JAVA_VERSION={{.JAVA_VERSION}} \
+          --build-arg SCALA_VERSION={{.SCALA_VERSION}} \
+          --build-arg ICEBERG_VERSION={{.ICEBERG_VERSION}} \
+          --build-arg PYTHON_VERSION={{.PYTHON_VERSION}} \
+          spark
+
+  spark:
+    cmds:
+      - task: spark-base
+        vars:
+          SPARK_VERSION: 3.5.0
+          SCALA_VERSION: 2.12
+          JAVA_VERSION: 17
+          ICEBERG_VERSION: 1.4.3
+          PYTHON_VERSION: 3.11.7
+
+  querybook:
+    vars:
+      REPO: ingtranet/querybook
+      QUERYBOOK_VERSION: 3.29.0
+    cmds:
+      - |
+        docker buildx build --push -t {{.REPO}}:{{.QUERYBOOK_VERSION}} \
+          --platform linux/amd64,linux/arm64 \
+          --build-arg QUERYBOOK_VERSION={{.QUERYBOOK_VERSION}} \
+          querybook
