@@ -4,11 +4,23 @@ FROM eclipse-temurin:$JAVA_VERSION-jdk AS builder
 ARG ICEBERG_VERSION
 ARG SPARK_VERSION
 ARG SCALA_VERSION
+ARG PYTHON_VERSION
 
 WORKDIR /build
 
 RUN apt update -y && \
-    apt install -y wget python3 python3-pip
+    apt install -y wget build-essential gdb lcov pkg-config \
+      libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
+      libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
+      lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+
+RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz && \
+    tar zxf Python-$PYTHON_VERSION.tgz && \
+    cd Python-$PYTHON_VERSION && \
+    ./configure --enable-optimizations --with-lto && \
+    make -s -j 8 && \
+    make install && \
+    cd .. && rm -rf Python-*
 
 RUN wget http://dlcdn.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION.tgz && \
     tar zxf spark-$SPARK_VERSION.tgz
@@ -25,8 +37,8 @@ RUN tar zxf spark-$SPARK_VERSION-bin-ingtranet.tgz && \
 
 WORKDIR /spark-$SPARK_VERSION-bin-ingtranet/jars
 
-RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcprov-jdk18on/1.71/bcprov-jdk18on-1.71.jar
-RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcpkix-jdk18on/1.71/bcpkix-jdk18on-1.71.jar
+RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcprov-jdk18on/1.77/bcprov-jdk18on-1.77.jar
+RUN wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/bouncycastle/bcpkix-jdk18on/1.77/bcpkix-jdk18on-1.77.jar
 RUN ["bash", "-c", "wget http://maven-central-asia.storage-download.googleapis.com/maven2/org/apache/iceberg/iceberg-spark-runtime-${SPARK_VERSION:0:3}_$SCALA_VERSION/$ICEBERG_VERSION/iceberg-spark-runtime-${SPARK_VERSION:0:3}_$SCALA_VERSION-$ICEBERG_VERSION.jar"]
 ##### BUILD FINISHED #####
 
@@ -36,7 +48,10 @@ FROM eclipse-temurin:$JAVA_VERSION
 ARG SPARK_VERSION
 ARG spark_uid=185
 
-RUN set -ex && \ 
+RUN set -ex && \
+    apt-get update && \
+    ln -s /lib /lib64 && \
+    apt install -y bash tini libc6 libpam-modules krb5-user libnss3 procps net-tools && \
     mkdir -p /opt/spark && \
     mkdir -p /opt/spark/examples && \
     mkdir -p /opt/spark/work-dir && \
@@ -44,11 +59,8 @@ RUN set -ex && \
     rm /bin/sh && \
     ln -sv /bin/bash /bin/sh && \
     echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
-    chgrp root /etc/passwd && chmod ug+rw /etc/passwd
-
-RUN apt update -y && \
-    apt install -y tini && \
-    rm -rf /var/cache/apt/*
+    chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
+    rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /spark-$SPARK_VERSION-bin-ingtranet/jars /opt/spark/jars
 COPY --from=builder /spark-$SPARK_VERSION-bin-ingtranet/bin /opt/spark/bin
