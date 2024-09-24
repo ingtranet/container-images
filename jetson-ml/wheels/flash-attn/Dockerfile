@@ -13,6 +13,6 @@ RUN cd flash-attention && \
     FLASH_ATTENTION_FORCE_BUILD=TRUE MAX_JOBS=4 python3 -m build --no-isolation
 RUN mkdir /tmp/wheels && mv flash-attention/dist/*.whl /tmp/wheels
 
-FROM scratch
+FROM busybox:1.36.1
 
 COPY --from=builder /tmp/wheels /wheels
