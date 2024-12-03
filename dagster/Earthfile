@@ -1,0 +1,19 @@
+VERSION 0.8
+
+build:
+    ARG python_version
+    ARG dagster_version
+    ARG dagster_libs_version
+    FROM python:${python_version}
+    RUN pip install \
+        dagster==${dagster_version} \
+        dagster-webserver==${dagster_version} \
+        dagster-graphql==${dagster_version} \
+        dagster-aws==${dagster_libs_version} \
+        dagster-docker==${dagster_libs_version} \
+        dagster-k8s==${dagster_libs_version} \
+        dagster-mysql==${dagster_libs_version} \
+        dagster-postgres==${dagster_libs_version}
+    ENV DAGSTER_HOME=/opt/dagster/dagster_home/
+    WORKDIR /opt/dagster/dagster_home/
+    SAVE IMAGE --push ingtranet/dagster:${dagster_version}
