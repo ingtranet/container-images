@@ -194,3 +194,9 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,visualstudiocode,direnv,macos,windows,linux
+
+# Superpowers working docs (specs, plans) — local only
+docs/superpowers/
+
+# Git worktrees
+.worktrees/
